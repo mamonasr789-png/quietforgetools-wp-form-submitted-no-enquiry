@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WordPress Contact Form Says Submitted but No Enquiry Received | QuietForgeTools</title>
+  <meta name="description" content="Visitor sees a thank-you or success message, but the business cannot find the enquiry. Trace form storage, notifications, mail, recipient, and CRM — free QuietForgeTools diagnostic guide." />
+  <link rel="canonical" href="https://mamonasr789-png.github.io/quietforgetools-wp-form-submitted-no-enquiry/" />
+  <meta name="robots" content="index,follow" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand"><a href="https://mamonasr789-png.github.io/quietforgetools/"><span>QuietForgeTools</span></a> · Free diagnostic guide</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap hero">
+      <div class="free-chip">Free guide · DIY first · no uploads</div>
+      <h1>WordPress Contact Form Says Submitted but No Enquiry Received</h1>
+      <p class="lead">
+        The visitor submits the form and sees a success or thank-you message.
+        Your team cannot find the enquiry in email, spam, form entries, or CRM.
+        This page traces the full enquiry path — not “form broken,” not “missing email only,” not “spam only.”
+      </p>
+      <div class="callout callout-accent" role="note">
+        <strong>Wrong symptom?</strong>
+        Broad form failure diagnosis:
+        <a href="https://mamonasr789-png.github.io/quietforgetools-wp-contact-form-not-sending/">contact form not sending</a>.
+        UI says sent but notification mail never appears anywhere:
+        <a href="https://mamonasr789-png.github.io/quietforgetools-wp-form-sent-no-email/">says sent, no email</a>.
+        Mail exists but lands in junk:
+        <a href="https://mamonasr789-png.github.io/quietforgetools-wp-form-emails-to-spam/">emails going to spam</a>.
+      </div>
+    </div>
+
+    <nav class="wrap toc" aria-label="On this page">
+      <h2 class="toc-title">On this page</h2>
+      <ol>
+        <li><a href="#success-proves">What success actually proves</a></li>
+        <li><a href="#local-storage">Local form storage / entries</a></li>
+        <li><a href="#notification-config">Notification configuration</a></li>
+        <li><a href="#recipient-routing">Recipient routing</a></li>
+        <li><a href="#spam-quarantine">Spam and quarantine</a></li>
+        <li><a href="#smtp-logs">SMTP and mail logs</a></li>
+        <li><a href="#crm-webhook">CRM / webhook failures</a></li>
+        <li><a href="#false-confidence">Thank-you false confidence</a></li>
+        <li><a href="#controlled-test">Controlled test submission</a></li>
+        <li><a href="#evidence">Evidence to keep</a></li>
+        <li><a href="#disappear-table">Where did the enquiry disappear?</a></li>
+        <li><a href="#isolated-vs-multi">Isolated vs multi-stage</a></li>
+      </ol>
+    </nav>
+
+    <section id="success-proves" aria-labelledby="h-success">
+      <div class="wrap">
+        <h2 id="h-success">1. What the success / thank-you message actually proves</h2>
+        <p>
+          A success message or thank-you page usually means the browser completed a form request
+          that the site accepted. It does <strong>not</strong> prove your business received the enquiry
+          in inbox, CRM, or even the form plugin’s storage.
+        </p>
+        <ul>
+          <li>Inline “Thank you” / AJAX success often fires after the plugin accepts the POST — before mail or CRM finishes.</li>
+          <li>A redirect to a thank-you URL can be static marketing content with no dependency on a saved entry.</li>
+          <li>Some themes show a soft success even when a later notification step fails silently.</li>
+          <li>Treat success as: <em>visitor path reached “accepted”</em> — then verify each later stage separately.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="local-storage" aria-labelledby="h-storage">
+      <div class="wrap">
+        <h2 id="h-storage">2. Whether the form stores submissions locally</h2>
+        <p>First ask: did WordPress keep a record of this enquiry at all?</p>
+        <ul>
+          <li>Open the form plugin’s Entries / Submissions / Leads list (Gravity Forms, WPForms, Fluent Forms, Formidable, etc.).</li>
+          <li>Search for a unique test phrase and the approximate submit time (with timezone).</li>
+          <li>If there is <strong>no entry</strong>, the break is at or before storage (validation, JS, AJAX error, wrong form ID, cache serving a stale form).</li>
+          <li>If there <strong>is an entry</strong> but nobody saw a notification, the visitor success was real — the disappearance is downstream (mail, routing, CRM).</li>
+          <li>Plugins that do not store entries by default leave you without this checkpoint — note that as a diagnostic gap.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="notification-config" aria-labelledby="h-notify">
+      <div class="wrap">
+        <h2 id="h-notify">3. Notification configuration</h2>
+        <p>Storage and “thank you” can both succeed while admin notification is off or mis-aimed.</p>
+        <ul>
+          <li>Confirm an admin / staff notification is enabled — not only a visitor auto-reply.</li>
+          <li>Check To, CC, BCC, and conditional logic (“send only if field X = …” can skip silent emails).</li>
+          <li>After migrations, templates often still point at old staff addresses or placeholder tags.</li>
+          <li>Separate “user confirmation” from “business notification” — one working does not imply the other.</li>
+          <li>If you only care about missing <em>email</em> after success, also read
+            <a href="https://mamonasr789-png.github.io/quietforgetools-wp-form-sent-no-email/">says sent but no email</a>.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="recipient-routing" aria-labelledby="h-recipient">
+      <div class="wrap">
+        <h2 id="h-recipient">4. Recipient routing</h2>
+        <p>The enquiry may have been delivered somewhere your team is not looking.</p>
+        <ul>
+          <li>Confirm the exact To address in the live notification template (typos, old domains, personal inboxes of leavers).</li>
+          <li>Check shared / group inboxes, aliases, and forwarding rules.</li>
+          <li>Dynamic recipients from form fields can route to empty or wrong addresses when a field is blank.</li>
+          <li>Role-based or department routing may send to a mailbox nobody monitors after a reorg.</li>
+          <li>Ask: “Where was the last known good recipient?” and compare to today’s config.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="spam-quarantine" aria-labelledby="h-spam">
+      <div class="wrap">
+        <h2 id="h-spam">5. Spam, junk, and quarantine</h2>
+        <p>Sometimes the enquiry did arrive — just not in the primary inbox view.</p>
+        <ul>
+          <li>Search Spam / Junk and provider quarantine for the unique test phrase.</li>
+          <li>Google Workspace / Microsoft 365 quarantine can hold first-time form mail.</li>
+          <li>Filters that auto-archive or label “Forms” can hide messages from the default inbox.</li>
+          <li>If you confirm the message exists in spam/junk, switch to the focused
+            <a href="https://mamonasr789-png.github.io/quietforgetools-wp-form-emails-to-spam/">emails going to spam</a> guide.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="smtp-logs" aria-labelledby="h-smtp">
+      <div class="wrap">
+        <h2 id="h-smtp">6. SMTP and mail-log evidence</h2>
+        <p>Use logs to separate “never sent” from “sent but not found by staff.”</p>
+        <ul>
+          <li>Note whether the site uses PHP <code>mail()</code>, an SMTP plugin, or a transactional API.</li>
+          <li>Run the plugin’s test email to the same production recipient; record accept/reject.</li>
+          <li>Look for SMTP / mailer log lines matching the test timestamp and To address.</li>
+          <li>Host mail logs (if available) showing deferred, rejected, or relayed for that attempt.</li>
+          <li>A clean “accepted by SMTP” with no inbox/spam find points to recipient-side routing or a different To than you think.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="crm-webhook" aria-labelledby="h-crm">
+      <div class="wrap">
+        <h2 id="h-crm">7. CRM, webhook, and integration failures</h2>
+        <p>Many sites no longer rely on email alone — the “enquiry” may be meant to land in a CRM or Zapier-style hop.</p>
+        <ul>
+          <li>Confirm whether success is supposed to create a CRM lead, HubSpot/Salesforce record, Google Sheet row, or Slack alert.</li>
+          <li>Check webhook / integration logs for HTTP errors, auth expiry, or rate limits around the test time.</li>
+          <li>A thank-you page can show even when the outbound webhook failed after the form saved locally.</li>
+          <li>Duplicate suppressions or “already exists” CRM rules can silently drop what staff expect as a new enquiry.</li>
+          <li>If email works but CRM does not (or the reverse), treat that as a multi-stage path — not one “form broken” ticket.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="false-confidence" aria-labelledby="h-false">
+      <div class="wrap">
+        <h2 id="h-false">8. Confirmation-page false confidence</h2>
+        <p>Success UX is for the visitor. Your operations need independent proof.</p>
+        <ul>
+          <li>Do not close a “form works” ticket based only on seeing the thank-you page in a browser.</li>
+          <li>Verify storage entry, notification log, and recipient/CRM presence for the same unique phrase.</li>
+          <li>Cached thank-you URLs or CDN pages can look “alive” while the live form endpoint is broken for some users.</li>
+          <li>Multi-step forms: earlier steps may show progress; only the final submit should create the enquiry — confirm which step fires storage/notification.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="controlled-test" aria-labelledby="h-test">
+      <div class="wrap">
+        <h2 id="h-test">9. Controlled test submission</h2>
+        <p>One disciplined test beats days of vague reports.</p>
+        <ul>
+          <li>Use a unique phrase (e.g. <code>ENQ-2026-10-03-A</code>) in the message body.</li>
+          <li>Record date/time with timezone, page URL, device, browser, and whether thank-you appeared.</li>
+          <li>Immediately check: form entries → notification logs → inbox + spam → CRM/webhook.</li>
+          <li>Optionally submit a second test to a mailbox you control, without leaving it as the live production To.</li>
+          <li>Change one variable between tests (recipient, SMTP, plugin toggle) — then retest.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="evidence" aria-labelledby="h-evidence">
+      <div class="wrap">
+        <h2 id="h-evidence">10. Timestamp and evidence to keep</h2>
+        <p>A short evidence pack turns “we never get enquiries” into a fixable path map.</p>
+        <ul>
+          <li>Unique phrase, submit timestamp (with timezone), form URL, form ID/name.</li>
+          <li>Screenshot or note of the success/thank-you UI.</li>
+          <li>Entry present? Y/N. Notification log line. SMTP accept/reject.</li>
+          <li>Inboxes / spam / quarantine checked; CRM/webhook result.</li>
+          <li>One change made between attempts.</li>
+        </ul>
+        <p>
+          Tip: mark the same items on the
+          <a href="https://mamonasr789-png.github.io/quietforgetools-wp-enquiry-checklist/">free Enquiry Path Checklist</a>
+          so you can hand a clear summary to a developer or host.
+        </p>
+      </div>
+    </section>
+
+    <section id="disappear-table" aria-labelledby="h-table">
+      <div class="wrap">
+        <h2 id="h-table">11. Where did the enquiry disappear?</h2>
+        <p class="section-lead">
+          Use the last stage you can prove, then check the next stage with the listed evidence.
+        </p>
+        <div class="table-wrap">
+          <table class="diag">
+            <thead>
+              <tr>
+                <th scope="col">Last verified stage</th>
+                <th scope="col">Next stage to check</th>
+                <th scope="col">Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Visitor clicked Submit</strong></td>
+                <td>Form request accepted</td>
+                <td>Network POST/AJAX status; validation errors; console errors</td>
+              </tr>
+              <tr>
+                <td><strong>Success / thank-you shown</strong></td>
+                <td>Local form storage / entry</td>
+                <td>Plugin Entries list for unique phrase + timestamp</td>
+              </tr>
+              <tr>
+                <td><strong>Entry saved</strong></td>
+                <td>Notification trigger</td>
+                <td>Notification enabled; To/CC; conditional logic; plugin mail log</td>
+              </tr>
+              <tr>
+                <td><strong>Notification attempted</strong></td>
+                <td>Mail delivery (SMTP/API)</td>
+                <td>SMTP/plugin log accept/reject; host mail log</td>
+              </tr>
+              <tr>
+                <td><strong>Mail accepted by relay</strong></td>
+                <td>Recipient inbox / spam / quarantine</td>
+                <td>Search unique phrase; spam folders; admin quarantine</td>
+              </tr>
+              <tr>
+                <td><strong>Mail not used (CRM path)</strong></td>
+                <td>CRM / webhook / integration</td>
+                <td>Webhook HTTP status; CRM lead list; auth/expiry errors</td>
+              </tr>
+              <tr>
+                <td><strong>Found in spam only</strong></td>
+                <td>Deliverability / From / auth</td>
+                <td>Follow <a href="https://mamonasr789-png.github.io/quietforgetools-wp-form-emails-to-spam/">emails to spam</a> guide</td>
+              </tr>
+              <tr>
+                <td><strong>No entry and no mail</strong></td>
+                <td>Front-end / broad form failure</td>
+                <td>Follow <a href="https://mamonasr789-png.github.io/quietforgetools-wp-contact-form-not-sending/">form not sending</a> guide</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="isolated-vs-multi" aria-labelledby="h-multi">
+      <div class="wrap">
+        <h2 id="h-multi">12. Isolated fault vs multi-stage enquiry-path failure</h2>
+        <p>
+          A single wrong To address, one disabled notification, or one spam-folder miss is often an isolated fix.
+          Treat it as a wider enquiry-path problem when several of these hold:
+        </p>
+        <ul>
+          <li>Thank-you shows, but storage, mail, and CRM disagree with each other.</li>
+          <li>Failures differ by device, form variant, or day.</li>
+          <li>SMTP, recipient routing, and an integration all need coordinated changes.</li>
+          <li>You cannot reproduce with one controlled test well enough to verify a single change.</li>
+        </ul>
+        <p>
+          Isolated, reproducible break at one stage → short fix territory.
+          Multi-stage / inconsistent disappearance across the path → map and repair the path, not one random toggle.
+          This guide does not claim any sequence will recover every missing enquiry.
+        </p>
+      </div>
+    </section>
+
+    <section id="next" aria-labelledby="h-next">
+      <div class="wrap">
+        <h2 id="h-next">If you want help fixing it</h2>
+        <p class="section-lead">
+          This guide and the free checklist are complete on their own. Use a paid option only if you prefer
+          bounded help after you’ve narrowed the failure — not as a required next step.
+        </p>
+        <div class="grid services">
+          <a class="card service" href="https://mamonasr789-png.github.io/quietforgetools-wp-enquiry-checklist/">
+            <div class="tag">Free · DIY</div>
+            <h3>Enquiry Path Checklist</h3>
+            <p>Mark form, email, mobile, and delivery checks yourself; copy a diagnostic summary. Nothing uploaded.</p>
+          </a>
+          <a class="card service" href="https://mamonasr789-png.github.io/quietforgetools-wp-maintenance/quick-fix/">
+            <div class="tag">Isolated / simple failure</div>
+            <h3>£49 WordPress Quick Fix</h3>
+            <p>One agreed problem: diagnosis, one fix attempt, verification, completion note.</p>
+          </a>
+          <a class="card service" href="https://mamonasr789-png.github.io/quietforgetools-enquiry-repair/">
+            <div class="tag">Multi-step enquiry path</div>
+            <h3>£149 Enquiry Path Repair</h3>
+            <p>One clearly defined broken enquiry, contact, or quote path — implement + test.</p>
+          </a>
+        </div>
+        <p class="hint">
+          Related diagnostics:
+          <a href="https://mamonasr789-png.github.io/quietforgetools-wp-contact-form-not-sending/">form not sending (broad)</a>
+          ·
+          <a href="https://mamonasr789-png.github.io/quietforgetools-wp-form-sent-no-email/">says sent, no email</a>
+          ·
+          <a href="https://mamonasr789-png.github.io/quietforgetools-wp-form-emails-to-spam/">emails to spam</a>
+          · Catalogue:
+          <a href="https://mamonasr789-png.github.io/quietforgetools/">QuietForgeTools hub</a>.
+          No private payment links on this page.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p><a href="https://mamonasr789-png.github.io/quietforgetools/">QuietForgeTools</a> · Form submitted but no enquiry received · free</p>
+      <p class="foot-note">
+        Related:
+        <a href="https://mamonasr789-png.github.io/quietforgetools-wp-contact-form-not-sending/">Form not sending (broad)</a>
+        ·
+        <a href="https://mamonasr789-png.github.io/quietforgetools-wp-form-sent-no-email/">Says sent, no email</a>
+        ·
+        <a href="https://mamonasr789-png.github.io/quietforgetools-wp-form-emails-to-spam/">Emails to spam</a>
+        ·
+        <a href="https://mamonasr789-png.github.io/quietforgetools-wp-enquiry-checklist/">Free checklist</a>
+        ·
+        <a href="https://mamonasr789-png.github.io/quietforgetools-wp-maintenance/quick-fix/">Quick Fix (£49)</a>
+        ·
+        <a href="https://mamonasr789-png.github.io/quietforgetools-enquiry-repair/">Enquiry Path Repair (£149)</a>.
+        This guide does not claim every WordPress enquiry problem has these causes, and does not guarantee recovery of missing enquiries.
+      </p>
+    </div>
+  </footer>
+</body>
+</html>
